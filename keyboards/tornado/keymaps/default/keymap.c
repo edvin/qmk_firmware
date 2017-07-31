@@ -70,13 +70,15 @@ void matrix_scan_user(void) {
 */
 };
 
-#define RESET_BUTTON1 (1 << 0)
-#define RESET_BUTTON2 (1 << 1)
-#define RESET_BUTTON3 (1 << 2)
-#define RESET_BUTTON4 (1 << 3)
-#define TORNADO_SHL (1 << 4)
-#define TORNADO_SHR (1 << 5)
-#define RESET_TRIGGERED (RESET_BUTTON1 | RESET_BUTTON2 | RESET_BUTTON3 | RESET_BUTTON4)
+#define RESET_BUTTON1     (1 << 0)
+#define RESET_BUTTON2     (1 << 1)
+#define RESET_BUTTON3     (1 << 2)
+#define RESET_BUTTON4     (1 << 3)
+#define TORNADO_SHL       (1 << 4)
+#define TORNADO_SHR       (1 << 5)
+#define TORNADO_CTRLL     RESET_BUTTON2
+#define TORNADO_CTRLR     RESET_BUTTON3
+#define RESET_TRIGGERED   (RESET_BUTTON1 | RESET_BUTTON2 | RESET_BUTTON3 | RESET_BUTTON4)
 
 static int combo_state = 0;
 
@@ -109,6 +111,32 @@ bool process_record_user (uint16_t keycode, keyrecord_t *record) {
       combo_state &= ~RESET_BUTTON4;
   }
 
+  if (combo_state & TORNADO_CTRLL) {
+    if (keycode == KC_RSPC) {
+      if (record->event.pressed) {
+        combo_state |= TORNADO_SHR;
+        unregister_code16(KC_LCTL);
+        register_code16(KC_RBRC);
+        unregister_code16(KC_RCBR);
+        register_code16(KC_LCTL);
+        return false;
+      }
+    }
+  }
+
+  if (combo_state & TORNADO_CTRLR) {
+    if (keycode == KC_LSPOb) {
+      if (record->event.pressed) {
+        combo_state |= TORNADO_SHL;
+        unregister_code16(KC_RCTL);
+        register_code16(KC_LBRC);
+        unregister_code16(KC_LCBR);
+        register_code16(KC_RCTL);
+        return false;
+      }
+    }
+  }
+
   // Space cadet left curly on steroids
   if (keycode == KC_LSPO) {
     if (record->event.pressed) {
@@ -136,7 +164,7 @@ bool process_record_user (uint16_t keycode, keyrecord_t *record) {
     else
       combo_state &= ~TORNADO_SHR;
   }
-  
+
   if (combo_state == RESET_TRIGGERED) {
     reset_keyboard();
     return false;
