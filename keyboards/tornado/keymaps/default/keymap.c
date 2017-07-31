@@ -74,40 +74,70 @@ void matrix_scan_user(void) {
 #define RESET_BUTTON2 (1 << 1)
 #define RESET_BUTTON3 (1 << 2)
 #define RESET_BUTTON4 (1 << 3)
+#define TORNADO_SHL (1 << 4)
+#define TORNADO_SHR (1 << 5)
 #define RESET_TRIGGERED (RESET_BUTTON1 | RESET_BUTTON2 | RESET_BUTTON3 | RESET_BUTTON4)
 
-static int reset_combo_state = 0;
+static int combo_state = 0;
 
 bool process_record_user (uint16_t keycode, keyrecord_t *record) {
   if (keycode == KC_GESC) {
     if (record->event.pressed)
-      reset_combo_state |= RESET_BUTTON1;
+      combo_state |= RESET_BUTTON1;
     else
-      reset_combo_state &= ~RESET_BUTTON1;
+      combo_state &= ~RESET_BUTTON1;
   }
 
   if (keycode == KC_LCTL) {
     if (record->event.pressed)
-      reset_combo_state |= RESET_BUTTON2;
+      combo_state |= RESET_BUTTON2;
     else
-      reset_combo_state &= ~RESET_BUTTON2;
+      combo_state &= ~RESET_BUTTON2;
   }
 
   if (keycode == KC_RCTL) {
     if (record->event.pressed)
-      reset_combo_state |= RESET_BUTTON3;
+      combo_state |= RESET_BUTTON3;
     else
-      reset_combo_state &= ~RESET_BUTTON3;
+      combo_state &= ~RESET_BUTTON3;
   }
 
   if (keycode == KC_EQL) {
     if (record->event.pressed)
-      reset_combo_state |= RESET_BUTTON4;
+      combo_state |= RESET_BUTTON4;
     else
-      reset_combo_state &= ~RESET_BUTTON4;
+      combo_state &= ~RESET_BUTTON4;
+  }
+
+  // Space cadet left curly on steroids
+  if (keycode == KC_LSPO) {
+    if (record->event.pressed) {
+      combo_state |= TORNADO_SHL;
+      if (combo_state & TORNADO_SHR) {
+          register_code16(KC_LCBR);
+          unregister_code16(KC_LCBR);
+          return false;
+      }
+    }
+    else
+      combo_state &= ~TORNADO_SHL;
   }
   
-  if (reset_combo_state == RESET_TRIGGERED) {
+  // Space cadet right curly on steroids
+  if (keycode == KC_RSPC) {
+    if (record->event.pressed) {
+      combo_state |= TORNADO_SHR;
+      if (combo_state & TORNADO_SHL) {
+          register_code16(KC_RCBR);
+          unregister_code16(KC_RCBR);
+          return false;
+      }
+    }
+    else
+      combo_state &= ~TORNADO_SHR;
+  }
+  
+  if (combo_state == RESET_TRIGGERED) {
     reset_keyboard();
     return false;
   }
