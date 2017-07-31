@@ -12,8 +12,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* 1: Numpad layer */
     KEYMAP_TORNADO(
         KC_ESC, KC_1, KC_2, KC_3, KC_4, KC_5, KC_DEL,KC_6, KC_7, KC_8, KC_9, KC_0, KC_TRNS, KC_TRNS,  \
-        KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS, KC_TRNS,KC_4,KC_5,KC_6,KC_TRNS,KC_TRNS,KC_TRNS,\
-        KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_1,KC_2,KC_3,KC_TRNS,KC_TRNS,KC_TRNS,\
+        KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS, KC_TRNS,KC_4,KC_5,KC_6,KC_TRNS,UC(0xE5),KC_TRNS,\
+        KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_1,KC_2,KC_3,KC_TRNS,UC(0xF8),UC(0xE6),\
         KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS,KC_0,KC_DOT,KC_TRNS,KC_TRNS,KC_TRNS, \
         KC_TRNS,KC_TRNS,KC_TRNS,KC_BTN1,KC_BTN2, KC_TRNS,KC_TRNS,KC_TRNS,KC_TRNS),
     /* 2: F + Arrow Keys layer */
@@ -70,38 +70,43 @@ void matrix_scan_user(void) {
 */
 };
 
-static uint8_t reset_combo_state = 0;
+#define RESET_BUTTON1 (1 << 0)
+#define RESET_BUTTON2 (1 << 1)
+#define RESET_BUTTON3 (1 << 2)
+#define RESET_BUTTON4 (1 << 3)
+#define RESET_TRIGGERED (RESET_BUTTON1 | RESET_BUTTON2 | RESET_BUTTON3 | RESET_BUTTON4)
+static int reset_combo_state = 0;
 
 bool process_record_user (uint16_t keycode, keyrecord_t *record) {
   if (keycode == KC_GESC) {
     if (record->event.pressed)
-      reset_combo_state |= 0B00000001;
+      reset_combo_state |= RESET_BUTTON1;
     else
-      reset_combo_state &= ~(0B00000001);
+      reset_combo_state &= ~RESET_BUTTON1;
   }
 
   if (keycode == KC_LCTL) {
     if (record->event.pressed)
-      reset_combo_state |= 0B00000010;
+      reset_combo_state |= RESET_BUTTON2;
     else
-      reset_combo_state &= ~(0B00000010);
+      reset_combo_state &= ~RESET_BUTTON2;
   }
 
   if (keycode == KC_RCTL) {
     if (record->event.pressed)
-      reset_combo_state |= 0B00000100;
+      reset_combo_state |= RESET_BUTTON3;
     else
-      reset_combo_state &= ~(0B00000100);
+      reset_combo_state &= ~RESET_BUTTON3;
   }
 
   if (keycode == KC_EQL) {
     if (record->event.pressed)
-      reset_combo_state |= 0B00001000;
+      reset_combo_state |= RESET_BUTTON4;
     else
-      reset_combo_state &= ~(0B00001000);
+      reset_combo_state &= ~RESET_BUTTON4;
   }
   
-  if (reset_combo_state == 0B00001111) {
+  if (reset_combo_state == RESET_TRIGGERED) {
     reset_keyboard();
     return false;
   }
