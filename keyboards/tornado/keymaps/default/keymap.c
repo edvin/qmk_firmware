@@ -26,7 +26,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 const uint16_t PROGMEM fn_actions[] = {
     [0] = ACTION_LAYER_MOMENTARY(1), // To Mouse overlay
-    [1] = ACTION_LAYER_MOMENTARY(2), // To F + Arrow Keys overlay
+    [1] = ACTION_LAYER_TAP_TOGGLE(2), // To F + Arrow Keys overlay
     [2] = ACTION_LAYER_TOGGLE(1),    // Toggle F + Arrow Keys overlay,
 };
 
