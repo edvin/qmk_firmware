@@ -26,12 +26,3 @@ void led_set_kb(uint8_t usb_led) {
 	led_set_user(usb_led);
 	*/
 }
-
-void matrix_init(void)
-{
-    palSetPadMode(GPIOD, 41,  PAL_MODE_INPUT);
-    palSetPadMode(GPIOD, 40,  PAL_MODE_INPUT);
-    palSetPadMode(GPIOD, 39,  PAL_MODE_INPUT);
-    palSetPadMode(GPIOD, 38,  PAL_MODE_INPUT);
-    palSetPadMode(GPIOD, 37,  PAL_MODE_INPUT);
-}
